@@ -13,6 +13,7 @@ import Crypto.Random.Entropy
 import Crypto.Hash.Algorithms
 import Data.Text.Encoding
 import Data.Aeson
+import Data.Aeson.Types
 import Database.PostgreSQL.Simple.ToField
 import Database.PostgreSQL.Simple.FromField
 
@@ -43,6 +44,9 @@ fromPlainText = PPlainText
 
 instance FromJSON (Password 'PlainText) where
   parseJSON = withText "Password PlainText" $ pure . fromPlainText
+
+instance FromJSON AnyPassword where
+  parseJSON x = fmap AnyPassword (parseJSON x :: Parser (Password 'PlainText))
 
 instance ToField (Password 'Hashed) where
   toField (PHashed x) = toField x
